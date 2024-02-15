@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wi-Fi Bağlantısı</title>
+</head>
+<body>
+    <h2>Mevcut Wi-Fi Ağları</h2>
+    <form action="/connect" method="post">
+        <select name="ssid">
+            {% for network in networks %}
+            <option value="{{ network }}">{{ network }}</option>
+            {% endfor %}
+        </select>
+        <input type="password" name="password" placeholder="Şifre">
+        <button type="submit">Bağlan</button>
+    </form>
+</body>
+</html>
