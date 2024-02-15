@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 def scan_wifi_networks():
     networks = []
-    scan_output = subprocess.check_output(['sudo', 'iwlist', 'wlp0s20f3', 'scan']).decode('utf-8')
+    scan_output = subprocess.check_output(['sudo', 'iwlist', 'wlan0', 'scan']).decode('utf-8')
     network_blocks = scan_output.split('Cell')[1:]  # Her bir ağ bloğunu ayır
     for block in network_blocks:
         ssid_search = re.search(r'ESSID:"(.+)"', block)
