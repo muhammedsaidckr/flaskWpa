@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Wifi Control</title>
+    <meta charset="UTF-8">
+    <title>Connection Information</title>
     <style>
         body {
           background-color: #121212;
@@ -43,19 +44,18 @@
           background-color: #1565c0;
         }
     </style>
-
 </head>
 <body>
-<h1>Wifi Control</h1>
-<form action="/submit" method="post">
-    <label for="ssid">Choose a WiFi network:</label>
-    <select name="ssid" id="ssid" required>
-        {% for ssid in ssids %}
-        <option value="{{ ssid }}">{{ ssid }}</option>
-        {% endfor %}
-    </select>
-    <label for="password">Password: <input type="password" id="password" name="password" required /></label>
-    <input type="submit" value="Connect">
-</form>
+<h1>Connection Information</h1>
+{% if message %}
+<div>{{ message | safe }}</div>
+{% endif %}
+
+{% if returncode == 0 %}
+<p></p>
+{% else %}
+<a href="/">Go back</a>
+{% endif %}
+
 </body>
 </html>
