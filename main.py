@@ -5,7 +5,7 @@ import time
 
 app = Flask(__name__)
 
-wifi_device = "wlp0s20f3"
+wifi_device = "wlan0"
 
 
 @app.route('/')
@@ -32,10 +32,10 @@ def submit():
 
         # restart the magicmirror service if it is not running
         # if the connection is successful
-        if result.returncode == 0 and check_internet_connection():
-            kill_process(8080)
-            time.sleep(1)  # Sürecin tamamen sonlandırılması için kısa bir bekleme
-            start_magic_mirror_service()
+        if result.returncode == 0:
+            print("reboot")
+            subprocess.run(["sudo", "reboot"])
+
 
         message = ("Success: Connected to <i>{}</i>".format(ssid)) \
             if result.returncode == 0 \
