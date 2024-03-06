@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
+import requests
 import subprocess
+import time
 
 app = Flask(__name__)
 
@@ -27,12 +29,56 @@ def submit():
             connection_command.append("password")
             connection_command.append(password)
         result = subprocess.run(connection_command, capture_output=True)
+
+        # restart the magicmirror service if it is not running
+        # if the connection is successful
+        if result.returncode == 0 and check_internet_connection():
+            kill_process(8080)
+            time.sleep(1)  # Sürecin tamamen sonlandırılması için kısa bir bekleme
+            start_magic_mirror_service()
+
         message = ("Success: Connected to <i>{}</i>".format(ssid)) \
             if result.returncode == 0 \
             else "Error: Failed to connect to <i>{}</i>".format(ssid)
         # return if it is error or success
         return render_template('result.html', message=message, returncode=result.returncode)
     return "Error: HTTP Method not allowed."
+
+
+def check_internet_connection():
+    """Internet bağlantısını kontrol et"""
+    try:
+        requests.get('http://google.com', timeout=5)
+        return True
+    except (requests.ConnectionError, requests.Timeout):
+        return False
+
+
+def kill_process(port):
+    """Belirli bir portu kullanan süreci sonlandır"""
+    try:
+        # netstat komutu ile belirli bir portu dinleyen sürecin PID'sini bul
+        result = subprocess.check_output(["sudo", "netstat", "-tulnp"]).decode('utf-8')
+        lines = result.splitlines()
+        for line in lines:
+            if f":{port}" in line:
+                parts = line.split()
+                pid = parts[-1].split("/")[0]
+                print(f"{port} portunu kullanan süreç bulundu: PID {pid}. Sonlandırılıyor...")
+                subprocess.run(["sudo", "kill", "-9", pid])
+                print(f"PID {pid} sonlandırıldı.")
+                return
+        print(f"{port} portunu kullanan herhangi bir süreç bulunamadı.")
+    except subprocess.CalledProcessError as e:
+        print(f"Hata: {e.output}")
+
+
+def start_magic_mirror_service():
+    """Yeni uygulamayı başlat"""
+    # Örnek olarak, bir HTTP sunucusunu belirli bir portta başlatma
+    print("Yeni uygulama başlatılıyor...")
+    subprocess.run(["sudo", "systemctl", "start", "magicmirror.service"])
+    print("HTTP sunucusu 8080 portunda başlatıldı.")
 
 
 if __name__ == '__main__':
